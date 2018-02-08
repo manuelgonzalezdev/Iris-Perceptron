@@ -19,7 +19,6 @@ class Perceptron(object):
         random_gen = np.random.RandomState(self.random_state)
         self._weights =  random_gen.normal(scale=0.01, size= X.shape[1] + 1)
         self._errors = []
-        print("Starting training")
         for i in range(self.n_iter):
             errors = 0
             for xi, target in zip(X, Y):
@@ -28,7 +27,6 @@ class Perceptron(object):
                 self._weights[1:] += update * xi
                 errors += 0 if update == 0 else 1
             self._errors.append(errors)
-            print('Iteration {} - errors {}'.format(i, self._errors[-1]))
 
     def predict(self, X):
         return np.where( self.net_input(X) >= 0.0, 1, -1)
