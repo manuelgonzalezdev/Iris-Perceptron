@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from perceptron import Perceptron
 from adaline import AdalineGD
+from adaline import AdalineSGD
 
 IRIS_DATASET_URL = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
 
@@ -49,7 +50,6 @@ def plot_decision_regions(X, y, classifier, resolution = 0.02):
 
     plt.title('Decision regions')
     plt.legend(loc='upper left')
-    plt.show()
 
 def plot_training_results(classifier):
     plt.plot(range(1, classifier.n_iter + 1), classifier._errors, marker='o')
@@ -84,20 +84,50 @@ plot_training_results(ppn)
 plot_decision_regions(X,y, classifier=ppn)
 '''
 
-fig, ax = plt.subplots(nrows=1, ncols = 2, figsize = (10, 4))
-ada1 = AdalineGD(n_iter=10, eta = 0.01).fit(X, y)
-ax[0].plot(range(1, len(ada1._cost) + 1), np.log10(ada1._cost), marker='o')
-ax[0].set_xlabel("Iterations")
-ax[0].set_ylabel('log(Sum-squared-error')
-ax[0].set_title('Adaline - Learning rate 0.01')
+# Apply standarization to data set
+X_std = np.copy(X)
+X_std[:, 0] = (X[:, 0] - X[:, 0].mean()) / X[:, 0].std()
+X_std[:, 1] = (X[:, 1] - X[:, 1].mean()) / X[:, 1].std()
 
-ada2 = AdalineGD(n_iter=10, eta = 0.0001).fit(X, y)
-ax[1].plot(range(1, len(ada2._cost) + 1), np.log10(ada2._cost), marker='o')
-ax[1].set_xlabel("Iterations")
-ax[1].set_ylabel('log(Sum-squared-error')
-ax[1].set_title('Adaline - Learning rate 0.0001')
+''' Adaline with Gradient Descent '''
+# fig, ax = plt.subplots(nrows=1, ncols = 2, figsize = (10, 4))
 
+# Training with no-standarized data
+
+# ada1 = AdalineGD(n_iter=15, eta = 0.01).fit(X, y)
+# ax[0].plot(range(1, len(ada1._cost) + 1), np.log10(ada1._cost), marker='o')
+# ax[0].set_xlabel("Iterations")
+# ax[0].set_ylabel('log(Sum-squared-error')
+# ax[0].set_title('Adaline - No-Standarized data set')
+
+# Training with standarized data
+
+# ada2 = AdalineGD(n_iter=15, eta = 0.01).fit(X_std, y)
+# ax[1].plot(range(1, len(ada2._cost) + 1), np.log10(ada2._cost), marker='o')
+# ax[1].set_xlabel("Iterations")
+# ax[1].set_ylabel('log(Sum-squared-error')
+# ax[1].set_title('Adaline - Standarized data set')
+
+# ada2 = AdalineGD(n_iter=10, eta = 0.0001).fit(X, y)
+# ax[1].plot(range(1, len(ada2._cost) + 1), np.log10(ada2._cost), marker='o')
+# ax[1].set_xlabel("Iterations")
+# ax[1].set_ylabel('log(Sum-squared-error')
+# ax[1].set_title('Adaline - Learning rate 0.0001')
+
+# plt.show()
+
+''' Adaline with Stochastic Gradient Descent '''
+ada = AdalineSGD(n_iter=15, eta=0.01, random_state = 1)
+ada.fit(X_std, y)
+
+plot_decision_regions(X_std, y, classifier=ada)
+plt.title("Adaline - Stochastic Gradient Descent")
+plt.xlabel("sepal length [standarized]")
+plt.ylabel("petal length [standarized]")
+plt.legend(loc='upper left')
 plt.show()
 
-
-
+plt.plot(range(1, len(ada._cost) + 1), ada._cost, marker = 'o')
+plt.xlabel("Iterations")
+plt.ylabel("Average cost")
+plt.show()
