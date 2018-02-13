@@ -28,6 +28,8 @@ class Perceptron(object):
                 errors += 0 if update == 0 else 1
             self._errors.append(errors)
 
+        return self
+
     def predict(self, X):
         return np.where( self.net_input(X) >= 0.0, 1, -1)
 

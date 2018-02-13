@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from perceptron import Perceptron
+from adaline import AdalineGD
 
 IRIS_DATASET_URL = 'https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data'
 
@@ -60,8 +61,8 @@ def plot_training_results(classifier):
 df = pd.read_csv(IRIS_DATASET_URL, header=None)
 
 # select setoca and versicolor
-Y = df.iloc[0:100, 4].values
-Y = np.where(Y =='Iris-setosa', 1, -1)
+y = df.iloc[0:100, 4].values
+y = np.where(y =='Iris-setosa', 1, -1)
 
 # extract sepal and petal length
 X = df.iloc[0:100, [0, 2]].values
@@ -75,9 +76,28 @@ labels = ['setosa', 'versicolor']
 plot_feature_distribution(features, labels)
 '''
 
+'''
 ppn = Perceptron(eta =0.1, n_iter=10)
-ppn.fit(X,Y)
+ppn.fit(X,y)
 
 plot_training_results(ppn)
-plot_decision_regions(X,Y, classifier=ppn)
+plot_decision_regions(X,y, classifier=ppn)
+'''
+
+fig, ax = plt.subplots(nrows=1, ncols = 2, figsize = (10, 4))
+ada1 = AdalineGD(n_iter=10, eta = 0.01).fit(X, y)
+ax[0].plot(range(1, len(ada1._cost) + 1), np.log10(ada1._cost), marker='o')
+ax[0].set_xlabel("Iterations")
+ax[0].set_ylabel('log(Sum-squared-error')
+ax[0].set_title('Adaline - Learning rate 0.01')
+
+ada2 = AdalineGD(n_iter=10, eta = 0.0001).fit(X, y)
+ax[1].plot(range(1, len(ada2._cost) + 1), np.log10(ada2._cost), marker='o')
+ax[1].set_xlabel("Iterations")
+ax[1].set_ylabel('log(Sum-squared-error')
+ax[1].set_title('Adaline - Learning rate 0.0001')
+
+plt.show()
+
+
 
